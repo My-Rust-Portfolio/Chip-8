@@ -1,3 +1,31 @@
+use std::fs;
+
+// First 512bytes (0x200) are for system, hence CHIP-8 games always start from 0x200 address
+const CHIP8_ROM_START: u16 = 0x200;
+
+// Font data starts at byte 80 (0x50)
+const CHIP8_RAM_FONTDATA_START: usize = 0x50;
+
+const FONTSET_SIZE: usize = 80;
+const FONTSET: [u8; FONTSET_SIZE] = [
+    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0x20, 0x60, 0x20, 0x20, 0x70, // 1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+    0xF0, 0x80, 0xF0, 0x80, 0x80, // F
+];
+
 #[derive(Debug)]
 pub struct Chip8 {
     pub cpu: Cpu,
@@ -15,6 +43,13 @@ impl Chip8 {
             keyboard: Keyboard::new(),
         }
     }
+
+    pub fn load_rom(&mut self, file_path: &str) {
+        let rom_data = fs::read(file_path).expect("Failed to read ROM file !");
+        let start: usize = CHIP8_ROM_START.into();
+        let end = start + rom_data.len();
+        self.ram.memory[start..end].copy_from_slice(&rom_data);
+    }
 }
 
 #[derive(Debug)]
@@ -24,7 +59,11 @@ pub struct Ram {
 
 impl Ram {
     fn new() -> Self {
-        Self { memory: [0; 4096] }
+        let mut m = [0; 4096];
+        m[CHIP8_RAM_FONTDATA_START..CHIP8_RAM_FONTDATA_START + FONTSET_SIZE]
+            .copy_from_slice(&FONTSET);
+
+        Self { memory: m }
     }
 }
 
@@ -70,7 +109,7 @@ impl Cpu {
         Self {
             registeres: [0; 16],
             index_register: 0,
-            program_counter: 0x200, // CHIP-8 always starts from 0x200 address
+            program_counter: CHIP8_ROM_START,
             stack: [0; 16],
             stack_p: 0,
             delay_timer: 0,

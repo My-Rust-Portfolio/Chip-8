@@ -1,6 +1,13 @@
 // First 512bytes (0x200) are for system, hence CHIP-8 games always start from 0x200 address
 pub const CHIP8_ROM_START: u16 = 0x200;
 
+pub enum SkipCondition {
+    RegisterXEqualsNn(usize, u8),
+    RegisterXNotEqualsNn(usize, u8),
+    RegisterXEqualsRegisterY(usize, usize),
+    RegisterXNotEqualsRegisterY(usize, usize),
+}
+
 #[derive(Debug)]
 pub struct Cpu {
     pub registeres: [u8; 16], // V0 to VF
@@ -43,26 +50,19 @@ impl Cpu {
         self.program_counter = nnn;
     }
 
-    pub fn skip_if_register_x_equals_nn(&mut self, x: usize, nn: u8) {
-        if self.registeres[x] == nn {
-            self.skip_instruction();
-        }
-    }
+    pub fn skip_instruction_if(&mut self, condition: SkipCondition) {
+        let skip = match condition {
+            SkipCondition::RegisterXEqualsNn(x, nn) => self.registeres[x] == nn,
+            SkipCondition::RegisterXNotEqualsNn(x, nn) => self.registeres[x] != nn,
+            SkipCondition::RegisterXEqualsRegisterY(x, y) => {
+                self.registeres[x] == self.registeres[y]
+            }
+            SkipCondition::RegisterXNotEqualsRegisterY(x, y) => {
+                self.registeres[x] != self.registeres[y]
+            }
+        };
 
-    pub fn skip_if_register_x_not_equals_nn(&mut self, x: usize, nn: u8) {
-        if self.registeres[x] != nn {
-            self.skip_instruction();
-        }
-    }
-
-    pub fn skip_if_register_x_equals_register_y(&mut self, x: usize, y: usize) {
-        if self.registeres[x] == self.registeres[y] {
-            self.skip_instruction();
-        }
-    }
-
-    pub fn skip_if_register_x_not_equals_register_y(&mut self, x: usize, y: usize) {
-        if self.registeres[x] != self.registeres[y] {
+        if skip {
             self.skip_instruction();
         }
     }

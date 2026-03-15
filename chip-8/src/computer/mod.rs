@@ -2,7 +2,7 @@ mod cpu;
 mod display;
 mod keyboard;
 mod ram;
-use cpu::{CHIP8_ROM_START, Cpu};
+use cpu::{CHIP8_ROM_START, Cpu, SkipCondition};
 use display::Display;
 use keyboard::Keyboard;
 use ram::Ram;
@@ -72,15 +72,18 @@ impl Chip8 {
             }
 
             (3, _, _, _) => {
-                self.cpu.skip_if_register_x_equals_nn(x, nn);
+                self.cpu
+                    .skip_instruction_if(SkipCondition::RegisterXEqualsNn(x, nn));
             }
 
             (4, _, _, _) => {
-                self.cpu.skip_if_register_x_not_equals_nn(x, nn);
+                self.cpu
+                    .skip_instruction_if(SkipCondition::RegisterXNotEqualsNn(x, nn));
             }
 
             (5, _, _, _) => {
-                self.cpu.skip_if_register_x_equals_register_y(x, y);
+                self.cpu
+                    .skip_instruction_if(SkipCondition::RegisterXEqualsRegisterY(x, y));
             }
 
             (6, _, _, _) => {
@@ -92,7 +95,8 @@ impl Chip8 {
             }
 
             (9, _, _, _) => {
-                self.cpu.skip_if_register_x_not_equals_register_y(x, y);
+                self.cpu
+                    .skip_instruction_if(SkipCondition::RegisterXNotEqualsRegisterY(x, y));
             }
 
             (0xA, _, _, _) => {

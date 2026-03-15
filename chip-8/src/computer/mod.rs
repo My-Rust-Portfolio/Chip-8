@@ -48,7 +48,7 @@ impl Chip8 {
         // 16bit long, represented as 4 hex digits
         let instruction = self.fetch();
 
-        let (op1, op2, op3, op4, x, y, nn, nnn) = unwrap_instruction(&instruction);
+        let (op1, op2, op3, op4, x, y, nn, nnn) = unwrap_instruction(instruction);
 
         match (op1, op2, op3, op4) {
             (0, 0, 0, 0) => {
@@ -104,7 +104,7 @@ impl Chip8 {
             }
 
             (_, _, _, _) => {
-                eprintln!("Unknown instrunction: {instruction:#06X}");
+                eprintln!("Unknown instruction: {instruction:#06X}");
             }
         }
     }
@@ -112,7 +112,7 @@ impl Chip8 {
 
 // ================= private helpers =================
 // 16bit instructions need to be unwrapped to be executed
-fn unwrap_instruction(instruction: &u16) -> (u16, u16, u16, u16, usize, usize, u8, u16) {
+fn unwrap_instruction(instruction: u16) -> (u16, u16, u16, u16, usize, usize, u8, u16) {
     // extract the 4 hex digits
     let op1 = (instruction & 0xF000) >> 12; // category digit
     let op2 = (instruction & 0x0F00) >> 8; // register x
@@ -126,5 +126,5 @@ fn unwrap_instruction(instruction: &u16) -> (u16, u16, u16, u16, usize, usize, u
     let nn = (instruction & 0x00FF) as u8;
     let nnn = instruction & 0x0FFF;
 
-    (op1, op2, op3, op4, y, x, nn, nnn)
+    (op1, op2, op3, op4, x, y, nn, nnn)
 }

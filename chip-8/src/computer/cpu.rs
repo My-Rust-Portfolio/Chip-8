@@ -10,7 +10,7 @@ pub enum SkipCondition {
 
 #[derive(Debug)]
 pub struct Cpu {
-    pub registeres: [u8; 16], // V0 to VF
+    pub registers: [u8; 16],  // V0 to VF
     pub index_register: u16,  // points to memory/RAM location
     pub program_counter: u16, // pointer to current instruction
     pub stack: [u16; 16],
@@ -22,7 +22,7 @@ pub struct Cpu {
 impl Cpu {
     pub fn new() -> Self {
         Self {
-            registeres: [0; 16],
+            registers: [0; 16],
             index_register: 0,
             program_counter: CHIP8_ROM_START,
             stack: [0; 16],
@@ -52,13 +52,11 @@ impl Cpu {
 
     pub fn skip_instruction_if(&mut self, condition: SkipCondition) {
         let skip = match condition {
-            SkipCondition::RegisterXEqualsNn(x, nn) => self.registeres[x] == nn,
-            SkipCondition::RegisterXNotEqualsNn(x, nn) => self.registeres[x] != nn,
-            SkipCondition::RegisterXEqualsRegisterY(x, y) => {
-                self.registeres[x] == self.registeres[y]
-            }
+            SkipCondition::RegisterXEqualsNn(x, nn) => self.registers[x] == nn,
+            SkipCondition::RegisterXNotEqualsNn(x, nn) => self.registers[x] != nn,
+            SkipCondition::RegisterXEqualsRegisterY(x, y) => self.registers[x] == self.registers[y],
             SkipCondition::RegisterXNotEqualsRegisterY(x, y) => {
-                self.registeres[x] != self.registeres[y]
+                self.registers[x] != self.registers[y]
             }
         };
 
@@ -68,11 +66,11 @@ impl Cpu {
     }
 
     pub fn set_register_x_to_nn(&mut self, x: usize, nn: u8) {
-        self.registeres[x] = nn;
+        self.registers[x] = nn;
     }
 
     pub fn add_nn_to_register_x(&mut self, x: usize, nn: u8) {
-        self.registeres[x] = self.registeres[x].wrapping_add(nn);
+        self.registers[x] = self.registers[x].wrapping_add(nn);
     }
 
     pub fn set_index_register(&mut self, nnn: u16) {

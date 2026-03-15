@@ -2,6 +2,7 @@
 const CHIP8_RAM_FONTDATA_START: usize = 0x50;
 
 const FONTSET_SIZE: usize = 80;
+const RAM_SIZE: usize = 4096;
 const FONTSET: [u8; FONTSET_SIZE] = [
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -23,12 +24,12 @@ const FONTSET: [u8; FONTSET_SIZE] = [
 
 #[derive(Debug)]
 pub struct Ram {
-    memory: [u8; 4096], // 4kb (4096b) of RAM
+    memory: [u8; RAM_SIZE], // 4kb (4096 byte) of RAM
 }
 
 impl Ram {
     pub fn new() -> Self {
-        let mut m = [0; 4096];
+        let mut m = [0; RAM_SIZE];
         m[CHIP8_RAM_FONTDATA_START..CHIP8_RAM_FONTDATA_START + FONTSET_SIZE]
             .copy_from_slice(&FONTSET);
 

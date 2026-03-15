@@ -1,16 +1,18 @@
+const DISPLAY_SIZE: usize = 64 * 32;
+
 #[derive(Debug)]
 pub struct Display {
-    display: [bool; 64 * 32],
+    display: [bool; DISPLAY_SIZE],
 }
 
 impl Display {
     pub fn new() -> Self {
         Self {
-            display: [false; 64 * 32],
+            display: [false; DISPLAY_SIZE],
         }
     }
 
     pub fn clear(&mut self) {
-        self.display = [false; 64 * 32];
+        self.display = [false; DISPLAY_SIZE];
     }
 }

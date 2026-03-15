@@ -1,6 +1,9 @@
 // First 512bytes (0x200) are for system, hence CHIP-8 games always start from 0x200 address
 pub const CHIP8_ROM_START: u16 = 0x200;
 
+const REGISTER_SIZE: usize = 16;
+const STACK_SIZE: usize = 16;
+
 pub enum SkipCondition {
     RegisterXEqualsNn(usize, u8),
     RegisterXNotEqualsNn(usize, u8),
@@ -10,10 +13,10 @@ pub enum SkipCondition {
 
 #[derive(Debug)]
 pub struct Cpu {
-    registers: [u8; 16],  // V0 to VF
-    index_register: u16,  // points to memory/RAM location
-    program_counter: u16, // pointer to current instruction
-    stack: [u16; 16],
+    registers: [u8; REGISTER_SIZE], // V0 to VF
+    index_register: u16,            // points to memory/RAM location
+    program_counter: u16,           // pointer to current instruction
+    stack: [u16; STACK_SIZE],
     stack_p: u8, // pointer to current stack + 1
     delay_timer: u8,
     sound_timer: u8,
@@ -22,10 +25,10 @@ pub struct Cpu {
 impl Cpu {
     pub fn new() -> Self {
         Self {
-            registers: [0; 16],
+            registers: [0; REGISTER_SIZE],
             index_register: 0,
             program_counter: CHIP8_ROM_START,
-            stack: [0; 16],
+            stack: [0; STACK_SIZE],
             stack_p: 0,
             delay_timer: 0,
             sound_timer: 0,

@@ -1,12 +1,15 @@
+// historically 16 keys
+const KEYBOARD_SIZE: usize = 16;
+
 #[derive(Debug)]
 pub struct Keyboard {
-    keypad: [bool; 16],
+    keypad: [bool; KEYBOARD_SIZE],
 }
 
 impl Keyboard {
     pub fn new() -> Self {
         Self {
-            keypad: [false; 16],
+            keypad: [false; KEYBOARD_SIZE],
         }
     }
 }

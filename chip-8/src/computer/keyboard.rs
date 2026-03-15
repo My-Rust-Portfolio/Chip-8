@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub struct Keyboard {
-    pub keypad: [bool; 16],
+    keypad: [bool; 16],
 }
 
 impl Keyboard {

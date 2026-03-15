@@ -28,15 +28,14 @@ impl Chip8 {
 
     pub fn load_rom(&mut self, file_path: &str) {
         let rom_data = fs::read(file_path).expect("Failed to read ROM file !");
-        let start: usize = CHIP8_ROM_START.into();
-        let end = start + rom_data.len();
-        self.ram.memory[start..end].copy_from_slice(&rom_data);
+        self.ram.write_slice(CHIP8_ROM_START, &rom_data);
     }
 
     pub fn fetch(&mut self) -> u16 {
         // single instruction in Chip8 is 16 bits (2 bytes) long. Our ram is array of 1 bytes
-        let byte1 = self.ram.memory[self.cpu.program_counter as usize] as u16;
-        let byte2 = self.ram.memory[(self.cpu.program_counter + 1) as usize] as u16;
+        let program_counter = self.cpu.get_program_counter();
+        let byte1 = self.ram.read_byte(program_counter) as u16;
+        let byte2 = self.ram.read_byte(program_counter + 1) as u16;
 
         self.cpu.skip_instruction();
 

@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub struct Display {
-    pub display: [bool; 64 * 32],
+    display: [bool; 64 * 32],
 }
 
 impl Display {

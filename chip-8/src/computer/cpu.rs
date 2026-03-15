@@ -10,13 +10,13 @@ pub enum SkipCondition {
 
 #[derive(Debug)]
 pub struct Cpu {
-    pub registers: [u8; 16],  // V0 to VF
-    pub index_register: u16,  // points to memory/RAM location
-    pub program_counter: u16, // pointer to current instruction
-    pub stack: [u16; 16],
-    pub stack_p: u8, // pointer to current stack + 1
-    pub delay_timer: u8,
-    pub sound_timer: u8,
+    registers: [u8; 16],  // V0 to VF
+    index_register: u16,  // points to memory/RAM location
+    program_counter: u16, // pointer to current instruction
+    stack: [u16; 16],
+    stack_p: u8, // pointer to current stack + 1
+    delay_timer: u8,
+    sound_timer: u8,
 }
 
 impl Cpu {
@@ -30,6 +30,10 @@ impl Cpu {
             delay_timer: 0,
             sound_timer: 0,
         }
+    }
+
+    pub fn get_program_counter(&self) -> u16 {
+        self.program_counter
     }
 
     pub fn skip_instruction(&mut self) {

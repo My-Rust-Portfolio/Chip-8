@@ -9,4 +9,8 @@ impl Display {
             display: [false; 64 * 32],
         }
     }
+
+    pub fn clear(&mut self) {
+        self.display = [false; 64 * 32];
+    }
 }

@@ -1,5 +1,5 @@
 // Font data starts at byte 80 (0x50)
-const CHIP8_RAM_FONTDATA_START: usize = 0x50;
+pub const CHIP8_RAM_FONTDATA_START: usize = 0x50;
 
 const FONTSET_SIZE: usize = 80;
 const RAM_SIZE: usize = 4096;

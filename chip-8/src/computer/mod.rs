@@ -5,7 +5,7 @@ mod ram;
 use cpu::{CHIP8_ROM_START, Cpu, SkipCondition};
 use display::Display;
 use keyboard::Keyboard;
-use ram::Ram;
+use ram::{CHIP8_RAM_FONTDATA_START, Ram};
 use std::fs;
 
 use crate::computer::display::{DISPLAY_HEIGHT, DISPLAY_WIDTH};
@@ -217,6 +217,38 @@ impl Chip8 {
 
                 0x1E => {
                     self.cpu.add_register_x_to_index_register(x);
+                }
+
+                0x29 => {
+                    let char_val = self.cpu.get_register_x(x) as u16;
+                    const FONT_SIZE: u16 = 5;
+                    let font_address = CHIP8_RAM_FONTDATA_START as u16 + (char_val * FONT_SIZE);
+                    self.cpu.set_index_register(font_address);
+                }
+
+                0x33 => {
+                    let reg = self.cpu.get_register_x(x);
+                    let i_reg = self.cpu.get_index_register();
+
+                    self.ram.write_byte(i_reg, reg / 100); // hundreds
+                    self.ram.write_byte(i_reg + 1, (reg / 10) % 10); // tens
+                    self.ram.write_byte(i_reg + 2, reg % 10); // ones
+                }
+
+                0x55 => {
+                    let i_reg = self.cpu.get_index_register();
+                    for i in 0..=x {
+                        let val = self.cpu.get_register_x(i);
+                        self.ram.write_byte(i_reg + i as u16, val);
+                    }
+                }
+
+                0x65 => {
+                    let i_reg = self.cpu.get_index_register();
+                    for i in 0..=x {
+                        let val = self.ram.read_byte(i_reg + i as u16);
+                        self.cpu.set_register_x_to_nn(i, val);
+                    }
                 }
 
                 _ => {

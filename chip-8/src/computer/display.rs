@@ -16,3 +16,7 @@ impl Display {
         self.display = [false; DISPLAY_SIZE];
     }
 }
+
+#[cfg(test)]
+#[path = "display_tests.rs"]
+mod tests;

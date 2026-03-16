@@ -62,7 +62,6 @@ impl Ram {
 
         const TOTAL_ROWS: usize = 4096 / 8;
 
-        // 2. Calculate the exact height of one row of text so egui knows how big the scrollbar should be
         let text_height = ui.text_style_height(&egui::TextStyle::Monospace);
         let row_height = text_height + ui.spacing().item_spacing.y;
 

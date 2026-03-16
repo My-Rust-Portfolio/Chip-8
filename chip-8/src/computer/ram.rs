@@ -49,4 +49,12 @@ impl Ram {
         let end = start + data.len();
         self.memory[start..end].copy_from_slice(data);
     }
+
+    pub fn read_slice(&self, start_address: u16, length: usize) -> &[u8] {
+        &self.memory[start_address as usize..length]
+    }
 }
+
+#[cfg(test)]
+#[path = "ram_tests.rs"]
+mod tests;

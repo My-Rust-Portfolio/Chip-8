@@ -3,7 +3,7 @@ mod tests {
     use crate::computer::cpu::*;
 
     #[test]
-    fn test_cpu_initialization() {
+    fn test_cpu_init() {
         let cpu = Cpu::new();
         assert_eq!(cpu.registers, [0; REGISTER_SIZE]);
         assert_eq!(cpu.index_register, 0);

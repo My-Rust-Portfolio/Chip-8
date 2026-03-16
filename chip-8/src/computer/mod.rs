@@ -198,7 +198,7 @@ impl Chip8 {
 
                         if !key_pressed {
                             let current_pc = self.cpu.get_program_counter();
-                            self.cpu.jump(current_pc - 2);
+                            self.cpu.jump(current_pc - 2); // loop the same instruction until a key is pressed  
                         }
                     }
                 }

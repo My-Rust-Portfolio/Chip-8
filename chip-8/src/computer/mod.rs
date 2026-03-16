@@ -195,11 +195,11 @@ impl Chip8 {
                             key_pressed = true;
                             break;
                         }
+                    }
 
-                        if !key_pressed {
-                            let current_pc = self.cpu.get_program_counter();
-                            self.cpu.jump(current_pc - 2); // loop the same instruction until a key is pressed  
-                        }
+                    if !key_pressed {
+                        let current_pc = self.cpu.get_program_counter();
+                        self.cpu.jump(current_pc - 2); // loop the same instruction until a key is pressed  
                     }
                 }
 

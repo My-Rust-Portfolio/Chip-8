@@ -99,10 +99,10 @@ mod tests {
     }
 
     #[test]
-    fn test_cpu_set_register() {
+    fn test_cpu_set_get_register() {
         let mut cpu = Cpu::new();
         cpu.set_register_x_to_nn(5, 6);
-        assert_eq!(cpu.registers[5], 6);
+        assert_eq!(cpu.get_register_x(5), 6);
     }
 
     #[test]
@@ -117,10 +117,10 @@ mod tests {
     }
 
     #[test]
-    fn test_cpu_set_index_to_register() {
+    fn test_cpu_set_get_index_register() {
         let mut cpu = Cpu::new();
         cpu.set_index_register(100);
-        assert_eq!(cpu.index_register, 100);
+        assert_eq!(cpu.get_index_register(), 100);
     }
 
     #[test]

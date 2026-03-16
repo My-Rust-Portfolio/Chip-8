@@ -75,12 +75,20 @@ impl Cpu {
         self.registers[x] = nn;
     }
 
+    pub fn get_register_x(&self, x: usize) -> u8 {
+        self.registers[x]
+    }
+
     pub fn add_nn_to_register_x(&mut self, x: usize, nn: u8) {
         self.registers[x] = self.registers[x].wrapping_add(nn);
     }
 
     pub fn set_index_register(&mut self, nnn: u16) {
         self.index_register = nnn;
+    }
+
+    pub fn get_index_register(&self) -> u16 {
+        self.index_register
     }
 
     pub fn set_register_x_to_y(&mut self, x: usize, y: usize) {

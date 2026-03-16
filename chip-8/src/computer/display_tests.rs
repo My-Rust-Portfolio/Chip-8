@@ -16,4 +16,11 @@ mod tests {
         display.clear();
         assert_eq!(display.display, [false; DISPLAY_SIZE]);
     }
+
+    #[test]
+    fn test_display_set_get_pixel() {
+        let mut display = Display::new();
+        display.set_pixel(100, true);
+        assert_eq!(display.get_pixel(100), true);
+    }
 }

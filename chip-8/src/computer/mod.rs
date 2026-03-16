@@ -8,6 +8,8 @@ use keyboard::Keyboard;
 use ram::Ram;
 use std::fs;
 
+use crate::computer::display::{DISPLAY_HEIGHT, DISPLAY_WIDTH};
+
 #[derive(Debug)]
 pub struct Chip8 {
     pub cpu: Cpu,
@@ -113,6 +115,53 @@ impl Chip8 {
 
             (0xA, _, _, _) => {
                 self.cpu.set_index_register(nnn);
+            }
+
+            (0xD, _, _, _) => {
+                let sprite_start_x = self.cpu.get_register_x(x) as usize % DISPLAY_WIDTH;
+                let sprite_start_y = self.cpu.get_register_x(y) as usize % DISPLAY_HEIGHT;
+
+                // prepare for collision detection, 0xF used to detect collisions
+                self.cpu.set_register_x_to_nn(0xF, 0);
+                let sprite_height = op4 as usize;
+
+                for row in 0..sprite_height {
+                    let current_y = sprite_start_y + row;
+
+                    // stop drawing if out of screen bottom
+                    if current_y >= DISPLAY_HEIGHT {
+                        break;
+                    }
+
+                    // read the sprite from RAM
+                    let i = self.cpu.get_index_register();
+                    let sprite_byte = self.ram.read_byte(i + row as u16);
+
+                    // loop over all 8 bits in the sprite byte
+                    for col in 0..8 {
+                        // stop drawing if out of the screen right
+                        let current_x = sprite_start_x + col;
+                        if current_x >= DISPLAY_WIDTH {
+                            break;
+                        }
+
+                        // 0x80 is 10000000, check if bit at col is set
+                        let sprite_pixel_is_set = (sprite_byte & (0x80 >> col)) != 0;
+
+                        if sprite_pixel_is_set {
+                            let pixel_index = current_y * DISPLAY_WIDTH + current_x;
+
+                            // if the screen pixel is already true, its collision
+                            if self.display.get_pixel(pixel_index) {
+                                self.cpu.set_register_x_to_nn(0xF, 1);
+                            }
+
+                            // XOR the pixel to the screen
+                            let val = self.display.get_pixel(pixel_index) ^ true;
+                            self.display.set_pixel(pixel_index, val);
+                        }
+                    }
+                }
             }
 
             (_, _, _, _) => {

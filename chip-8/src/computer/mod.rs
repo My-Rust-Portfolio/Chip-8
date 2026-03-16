@@ -117,6 +117,10 @@ impl Chip8 {
                 self.cpu.set_index_register(nnn);
             }
 
+            (0xC, _, _, _) => {
+                self.cpu.set_register_x_to_random_and_nn(x, nn);
+            }
+
             (0xD, _, _, _) => {
                 let sprite_start_x = self.cpu.get_register_x(x) as usize % DISPLAY_WIDTH;
                 let sprite_start_y = self.cpu.get_register_x(y) as usize % DISPLAY_HEIGHT;
@@ -183,6 +187,14 @@ impl Chip8 {
                         eprintln!("Unknown E-series instruction: {instruction:#06X}");
                     }
                 }
+            }
+
+            (0xF, _, 0x7, 0x5) => {
+                self.cpu.store_rpl_flags(x);
+            }
+
+            (0xF, _, 0x8, 0x5) => {
+                self.cpu.load_rpl_flags(x);
             }
 
             (0xF, _, _, _) => match nn {

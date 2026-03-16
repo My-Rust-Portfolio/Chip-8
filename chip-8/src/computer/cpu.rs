@@ -1,3 +1,5 @@
+use rand::RngExt;
+
 // First 512bytes (0x200) are for system, hence CHIP-8 games always start from 0x200 address
 pub const CHIP8_ROM_START: u16 = 0x200;
 pub const REGISTER_SIZE: usize = 16;
@@ -19,6 +21,7 @@ pub struct Cpu {
     stack_p: u8, // pointer to current stack + 1
     delay_timer: u8,
     sound_timer: u8,
+    rpl_flags: [u8; 8], // for super Chip8 support
 }
 
 impl Cpu {
@@ -31,6 +34,7 @@ impl Cpu {
             stack_p: 0,
             delay_timer: 0,
             sound_timer: 0,
+            rpl_flags: [0; 8],
         }
     }
 
@@ -156,6 +160,22 @@ impl Cpu {
         self.set_index_register(self.registers[x] as u16 + self.index_register);
     }
 
+    pub fn set_register_x_to_random_and_nn(&mut self, x: usize, nn: u8) {
+        self.registers[x] = rand::rng().random::<u8>() & nn;
+    }
+
+    pub fn store_rpl_flags(&mut self, x: usize) {
+        for i in 0..=x.min(7) {
+            self.rpl_flags[i] = self.registers[i];
+        }
+    }
+
+    pub fn load_rpl_flags(&mut self, x: usize) {
+        for i in 0..=x.min(7) {
+            self.registers[i] = self.rpl_flags[i];
+        }
+    }
+
     pub fn update_delay_timer(&mut self) {
         if self.delay_timer > 0 {
             self.delay_timer -= 1;
@@ -164,7 +184,7 @@ impl Cpu {
 
     pub fn update_sound_timer(&mut self) {
         if self.sound_timer > 0 {
-            self.delay_timer -= 1;
+            self.sound_timer -= 1;
         }
     }
 }

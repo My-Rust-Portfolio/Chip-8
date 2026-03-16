@@ -254,4 +254,42 @@ mod tests {
         cpu.add_register_x_to_index_register(0);
         assert_eq!(cpu.index_register, 20);
     }
+
+    #[test]
+    fn test_cpu_update_delay_timer() {
+        let mut cpu = Cpu::new();
+        cpu.delay_timer = 10;
+        cpu.update_delay_timer();
+        assert_eq!(cpu.delay_timer, 9);
+    }
+
+    #[test]
+    fn test_cpu_update_sound_timer() {
+        let mut cpu = Cpu::new();
+        cpu.sound_timer = 10;
+        cpu.update_sound_timer();
+        assert_eq!(cpu.sound_timer, 9);
+    }
+
+    #[test]
+    fn test_cpu_store_rpl_flags() {
+        let mut cpu = Cpu::new();
+        for i in 0..8 {
+            cpu.registers[i] = i as u8;
+        }
+        cpu.store_rpl_flags(100);
+        let vals: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 7];
+        assert_eq!(cpu.rpl_flags, vals);
+    }
+
+    #[test]
+    fn test_cpu_load_rpl_flags() {
+        let mut cpu = Cpu::new();
+        for i in 0..8 {
+            cpu.rpl_flags[i] = i as u8;
+        }
+        cpu.load_rpl_flags(100);
+        let vals: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 7];
+        assert_eq!(cpu.registers[0..8], vals);
+    }
 }

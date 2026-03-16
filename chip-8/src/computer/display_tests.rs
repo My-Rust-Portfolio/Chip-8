@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::computer::display::{self, *};
+    use crate::computer::display::*;
 
     #[test]
     fn test_display_init() {
@@ -11,10 +11,7 @@ mod tests {
     #[test]
     fn test_display_clear() {
         let mut display = Display::new();
-        display.display[100] = true;
-        display.display[101] = true;
-        display.display[102] = true;
-        display.display[103] = true;
+        display.display[100..200].fill(true);
         assert_ne!(display.display, [false; DISPLAY_SIZE]);
         display.clear();
         assert_eq!(display.display, [false; DISPLAY_SIZE]);

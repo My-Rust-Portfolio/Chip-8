@@ -12,7 +12,7 @@ pub enum SkipCondition {
 
 #[derive(Debug)]
 pub struct Cpu {
-    registers: [u8; REGISTER_SIZE], // V0 to VF
+    registers: [u8; REGISTER_SIZE], // V0 to VF, V0 to VE general use, VF for overflown bits from the last math operation
     index_register: u16,            // points to memory/RAM location
     program_counter: u16,           // pointer to current instruction
     stack: [u16; STACK_SIZE],
@@ -81,6 +81,55 @@ impl Cpu {
 
     pub fn set_index_register(&mut self, nnn: u16) {
         self.index_register = nnn;
+    }
+
+    pub fn set_register_x_to_y(&mut self, x: usize, y: usize) {
+        self.registers[x] = self.registers[y];
+    }
+
+    pub fn bitwise_or(&mut self, x: usize, y: usize) {
+        self.registers[x] |= self.registers[y];
+    }
+
+    pub fn bitwise_and(&mut self, x: usize, y: usize) {
+        self.registers[x] &= self.registers[y];
+    }
+
+    pub fn bitwise_xor(&mut self, x: usize, y: usize) {
+        self.registers[x] ^= self.registers[y];
+    }
+
+    pub fn add_y_to_x_with_carry(&mut self, x: usize, y: usize) {
+        let (result, carry) = self.registers[x].overflowing_add(self.registers[y]);
+        self.registers[x] = result;
+        self.registers[0xF] = if carry { 1 } else { 0 };
+    }
+
+    pub fn sub_y_from_x(&mut self, x: usize, y: usize) {
+        let (result, borrow) = self.registers[x].overflowing_sub(self.registers[y]);
+        self.registers[x] = result;
+        self.registers[0xF] = if borrow { 0 } else { 1 };
+    }
+
+    pub fn shift_right(&mut self, x: usize) {
+        // div by 2
+        let dropped_bit = self.registers[x] & 1;
+        self.registers[x] >>= 1;
+        self.registers[0xF] = dropped_bit;
+    }
+
+    pub fn sub_x_from_y(&mut self, x: usize, y: usize) {
+        let (result, borrow) = self.registers[y].overflowing_sub(self.registers[x]);
+        self.registers[x] = result;
+        self.registers[0xF] = if borrow { 0 } else { 1 };
+    }
+
+    pub fn shift_left(&mut self, x: usize) {
+        // mult by 2
+        // 8th bit 1000_0000 in binary, 0x80 in hex, move by 7 to get it
+        let dropped_bit = (self.registers[x] & 0x80) >> 7;
+        self.registers[x] <<= 1;
+        self.registers[0xF] = dropped_bit;
     }
 }
 

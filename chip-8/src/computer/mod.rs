@@ -93,6 +93,19 @@ impl Chip8 {
                 self.cpu.add_nn_to_register_x(x, nn);
             }
 
+            (8, _, _, _) => match op4 {
+                0 => self.cpu.set_register_x_to_y(x, y),
+                1 => self.cpu.bitwise_or(x, y),
+                2 => self.cpu.bitwise_and(x, y),
+                3 => self.cpu.bitwise_xor(x, y),
+                4 => self.cpu.add_y_to_x_with_carry(x, y),
+                5 => self.cpu.sub_y_from_x(x, y),
+                6 => self.cpu.shift_right(x),
+                7 => self.cpu.sub_x_from_y(x, y),
+                0xE => self.cpu.shift_left(x),
+                _ => eprintln!("Unknown 8-series instruction: {instruction:#06X}"),
+            },
+
             (9, _, _, _) => {
                 self.cpu
                     .skip_instruction_if(SkipCondition::RegisterXNotEqualsRegisterY(x, y));

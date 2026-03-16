@@ -38,14 +38,14 @@ mod tests {
         const SUBROUTINE: u16 = CHIP8_ROM_START + 64;
         cpu.jump(CURRENT_ROUTINE);
         cpu.call_subroutine(SUBROUTINE);
-        assert_eq!(cpu.stack[0], CURRENT_ROUTINE);
+        assert_eq!(cpu.stack[(cpu.stack_p - 1) as usize], CURRENT_ROUTINE);
         assert_eq!(cpu.get_program_counter(), SUBROUTINE);
         cpu.return_from_subroutine();
         assert_eq!(cpu.get_program_counter(), CURRENT_ROUTINE);
     }
 
     #[test]
-    fn test_cpu_skip_if_() {
+    fn test_cpu_skip_if_register_x_equals_nn() {
         let mut cpu = Cpu::new();
         let cond = SkipCondition::RegisterXEqualsNn(5, 6);
         cpu.registers[5] = 6;
@@ -55,7 +55,10 @@ mod tests {
         let cond = SkipCondition::RegisterXEqualsNn(5, 6);
         cpu.skip_instruction_if(cond);
         assert_eq!(cpu.program_counter, CHIP8_ROM_START + 2);
+    }
 
+    #[test]
+    fn test_cpu_skip_if_register_x_not_equals_nn() {
         let mut cpu = Cpu::new();
         let cond = SkipCondition::RegisterXNotEqualsNn(5, 6);
         cpu.registers[5] = 6;
@@ -65,7 +68,10 @@ mod tests {
         let cond = SkipCondition::RegisterXNotEqualsNn(5, 6);
         cpu.skip_instruction_if(cond);
         assert_eq!(cpu.program_counter, CHIP8_ROM_START + 2);
+    }
 
+    #[test]
+    fn test_cpu_skip_if_register_x_equals_register_y() {
         let mut cpu = Cpu::new();
         let cond = SkipCondition::RegisterXEqualsRegisterY(5, 6);
         cpu.registers[5] = 6;
@@ -76,7 +82,10 @@ mod tests {
         let cond = SkipCondition::RegisterXEqualsRegisterY(5, 6);
         cpu.skip_instruction_if(cond);
         assert_eq!(cpu.program_counter, CHIP8_ROM_START + 2);
+    }
 
+    #[test]
+    fn test_cpu_skip_if_register_x_not_equals_register_y() {
         let mut cpu = Cpu::new();
         let cond = SkipCondition::RegisterXNotEqualsRegisterY(5, 6);
         cpu.registers[5] = 6;
@@ -112,5 +121,104 @@ mod tests {
         let mut cpu = Cpu::new();
         cpu.set_index_register(100);
         assert_eq!(cpu.index_register, 100);
+    }
+
+    #[test]
+    fn test_cpu_bitwise_or() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 1); // 001
+        cpu.set_register_x_to_nn(1, 2); // 010
+        cpu.bitwise_or(0, 1); // 011 = 3
+        assert_eq!(cpu.registers[0], 3);
+    }
+
+    #[test]
+    fn test_cpu_bitwise_and() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 1); // 001
+        cpu.set_register_x_to_nn(1, 2); // 010
+        cpu.bitwise_and(0, 1); // 000 = 0
+        assert_eq!(cpu.registers[0], 0);
+    }
+
+    #[test]
+    fn test_cpu_bitwise_xor() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 10); // 1010
+        cpu.set_register_x_to_nn(1, 6); // 0110
+        cpu.bitwise_xor(0, 1); // 1100 = 12
+        assert_eq!(cpu.registers[0], 12);
+    }
+
+    #[test]
+    fn test_cpu_add_y_to_x_carry() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 250);
+        cpu.set_register_x_to_nn(1, 5);
+        cpu.add_y_to_x_with_carry(0, 1);
+        assert_eq!(cpu.registers[0], 255);
+        assert_eq!(cpu.registers[0x0F], 0);
+        cpu.set_register_x_to_nn(1, 1);
+        cpu.add_y_to_x_with_carry(0, 1);
+        assert_eq!(cpu.registers[0], 0);
+        assert_eq!(cpu.registers[0x0F], 1);
+    }
+
+    #[test]
+    fn test_cpu_sub_y_from_x() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 250);
+        cpu.set_register_x_to_nn(1, 5);
+        cpu.sub_y_from_x(0, 1);
+        assert_eq!(cpu.registers[0], 245);
+        assert_eq!(cpu.registers[0x0F], 1);
+        cpu.set_register_x_to_nn(1, 246);
+        cpu.sub_y_from_x(0, 1);
+        assert_eq!(cpu.registers[0], 255);
+        assert_eq!(cpu.registers[0x0F], 0);
+    }
+
+    #[test]
+    fn test_cpu_shift_right() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 6);
+        cpu.shift_right(0);
+        assert_eq!(cpu.registers[0], 3);
+        assert_eq!(cpu.registers[0xF], 0);
+        cpu.shift_right(0);
+        assert_eq!(cpu.registers[0], 1);
+        assert_eq!(cpu.registers[0xF], 1);
+        cpu.shift_right(0);
+        assert_eq!(cpu.registers[0], 0);
+        assert_eq!(cpu.registers[0xF], 1);
+        cpu.shift_right(0);
+        assert_eq!(cpu.registers[0], 0);
+        assert_eq!(cpu.registers[0xF], 0);
+    }
+
+    #[test]
+    fn test_cpu_sub_x_from_y() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 5);
+        cpu.set_register_x_to_nn(1, 250);
+        cpu.sub_x_from_y(0, 1);
+        assert_eq!(cpu.registers[0], 245);
+        assert_eq!(cpu.registers[0xF], 1);
+        cpu.set_register_x_to_nn(1, 244);
+        cpu.sub_x_from_y(0, 1);
+        assert_eq!(cpu.registers[0], 255);
+        assert_eq!(cpu.registers[0xF], 0);
+    }
+
+    #[test]
+    fn test_cpu_shsif_left() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 100);
+        cpu.shift_left(0);
+        assert_eq!(cpu.registers[0], 200);
+        assert_eq!(cpu.registers[0xF], 0);
+        cpu.shift_left(0);
+        assert_eq!(cpu.registers[0], 144);
+        assert_eq!(cpu.registers[0xF], 1);
     }
 }

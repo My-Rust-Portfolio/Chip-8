@@ -8,16 +8,20 @@ impl Keyboard {
         Self { keypad: 0 }
     }
 
-    pub fn is_pressed(&self, key_to_check: usize) -> bool {
+    pub fn is_pressed(&self, key_to_check: u16) -> bool {
         self.keypad & (1 << key_to_check) != 0
     }
 
-    pub fn press(&mut self, key_to_press: usize) {
+    pub fn press(&mut self, key_to_press: u16) {
         self.keypad |= 1 << key_to_press;
     }
 
-    pub fn release(&mut self, key_to_release: usize) {
+    pub fn release(&mut self, key_to_release: u16) {
         self.keypad &= !(1 << key_to_release);
+    }
+
+    pub fn reset(&mut self) {
+        self.keypad = 0;
     }
 }
 

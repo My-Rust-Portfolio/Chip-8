@@ -155,6 +155,18 @@ impl Cpu {
     pub fn add_register_x_to_index_register(&mut self, x: usize) {
         self.set_index_register(self.registers[x] as u16 + self.index_register);
     }
+
+    pub fn update_delay_timer(&mut self) {
+        if self.delay_timer > 0 {
+            self.delay_timer -= 1;
+        }
+    }
+
+    pub fn update_sound_timer(&mut self) {
+        if self.sound_timer > 0 {
+            self.delay_timer -= 1;
+        }
+    }
 }
 
 // ============ private helpers ============

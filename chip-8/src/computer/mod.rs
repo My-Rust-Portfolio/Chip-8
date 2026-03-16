@@ -12,10 +12,10 @@ use crate::computer::display::{DISPLAY_HEIGHT, DISPLAY_WIDTH};
 
 #[derive(Debug)]
 pub struct Chip8 {
-    pub cpu: Cpu,
-    pub ram: Ram,
-    pub display: Display,
-    pub keyboard: Keyboard,
+    cpu: Cpu,
+    ram: Ram,
+    display: Display,
+    keyboard: Keyboard,
 }
 
 impl Chip8 {
@@ -165,7 +165,7 @@ impl Chip8 {
             }
 
             (0xE, _, _, _) => {
-                let key_to_check = self.cpu.get_register_x(x) as usize;
+                let key_to_check = self.cpu.get_register_x(x) as u16;
                 let is_pressed = self.keyboard.is_pressed(key_to_check);
 
                 match nn {
@@ -260,6 +260,30 @@ impl Chip8 {
                 eprintln!("Unknown instruction: {instruction:#06X}");
             }
         }
+    }
+
+    pub fn update_delay_timer(&mut self) {
+        self.cpu.update_delay_timer();
+    }
+
+    pub fn update_sound_timer(&mut self) {
+        self.cpu.update_sound_timer();
+    }
+
+    pub fn get_cpu_program_counter(&self) -> u16 {
+        self.cpu.get_program_counter()
+    }
+
+    pub fn reset_keyboard(&mut self) {
+        self.keyboard.reset();
+    }
+
+    pub fn key_pressed(&mut self, key: u16) {
+        self.keyboard.press(key);
+    }
+
+    pub fn is_pixel_set(&self, index: usize) -> bool {
+        self.display.get_pixel(index)
     }
 }
 

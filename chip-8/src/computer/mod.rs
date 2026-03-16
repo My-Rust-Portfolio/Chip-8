@@ -164,6 +164,50 @@ impl Chip8 {
                 }
             }
 
+            (0xE, _, _, _) => {
+                let key_to_check = self.cpu.get_register_x(x) as usize;
+                let is_pressed = self.keyboard.is_pressed(key_to_check);
+
+                match nn {
+                    0x9E => {
+                        if is_pressed {
+                            self.cpu.skip_instruction();
+                        }
+                    }
+                    0xA1 => {
+                        if !is_pressed {
+                            self.cpu.skip_instruction();
+                        }
+                    }
+                    _ => {
+                        eprintln!("Unknown E-series instruction: {instruction:#06X}");
+                    }
+                }
+            }
+
+            (0xF, _, _, _) => match nn {
+                0x0A => {
+                    let mut key_pressed = false;
+                    for i in 0..16 {
+                        if self.keyboard.is_pressed(i) {
+                            // We found a pressed key! Store its index in Vx.
+                            self.cpu.set_register_x_to_nn(x, i as u8);
+                            key_pressed = true;
+                            break;
+                        }
+
+                        if !key_pressed {
+                            let current_pc = self.cpu.get_program_counter();
+                            self.cpu.jump(current_pc - 2);
+                        }
+                    }
+                }
+
+                _ => {
+                    eprintln!("Unknown F-series instruction: {instruction:#06X}");
+                }
+            },
+
             (_, _, _, _) => {
                 eprintln!("Unknown instruction: {instruction:#06X}");
             }

@@ -12,4 +12,8 @@ impl Keyboard {
             keypad: [false; KEYBOARD_SIZE],
         }
     }
+
+    pub fn is_pressed(&self, key_to_check: usize) -> bool {
+        self.keypad[key_to_check]
+    }
 }

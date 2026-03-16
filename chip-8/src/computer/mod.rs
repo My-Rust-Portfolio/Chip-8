@@ -203,6 +203,22 @@ impl Chip8 {
                     }
                 }
 
+                0x07 => {
+                    self.cpu.set_register_x_to_delay_timer(x);
+                }
+
+                0x15 => {
+                    self.cpu.set_delay_timer_to_register_x(x);
+                }
+
+                0x18 => {
+                    self.cpu.set_sound_timer_to_register_x(x);
+                }
+
+                0x1E => {
+                    self.cpu.add_register_x_to_index_register(x);
+                }
+
                 _ => {
                     eprintln!("Unknown F-series instruction: {instruction:#06X}");
                 }

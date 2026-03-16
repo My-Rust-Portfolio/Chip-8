@@ -211,7 +211,7 @@ mod tests {
     }
 
     #[test]
-    fn test_cpu_shsif_left() {
+    fn test_cpu_shift_left() {
         let mut cpu = Cpu::new();
         cpu.set_register_x_to_nn(0, 100);
         cpu.shift_left(0);
@@ -220,5 +220,38 @@ mod tests {
         cpu.shift_left(0);
         assert_eq!(cpu.registers[0], 144);
         assert_eq!(cpu.registers[0xF], 1);
+    }
+
+    #[test]
+    fn test_cpu_set_register_x_to_delay_timer() {
+        let mut cpu = Cpu::new();
+        cpu.delay_timer = 10;
+        cpu.set_register_x_to_delay_timer(0);
+        assert_eq!(cpu.registers[0], 10);
+    }
+
+    #[test]
+    fn test_cpu_set_delay_timer_to_register() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 10);
+        cpu.set_delay_timer_to_register_x(0);
+        assert_eq!(cpu.delay_timer, 10);
+    }
+
+    #[test]
+    fn test_cpu_set_sound_timer_to_register_x() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 10);
+        cpu.set_sound_timer_to_register_x(0);
+        assert_eq!(cpu.sound_timer, 10);
+    }
+
+    #[test]
+    fn test_cpu_add_register_x_to_index_register() {
+        let mut cpu = Cpu::new();
+        cpu.set_register_x_to_nn(0, 10);
+        cpu.set_index_register(10);
+        cpu.add_register_x_to_index_register(0);
+        assert_eq!(cpu.index_register, 20);
     }
 }

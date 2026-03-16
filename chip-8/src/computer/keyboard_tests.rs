@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::computer::keyboard::{self, *};
+    use crate::computer::keyboard::*;
 
     #[test]
     fn test_keyboard_init() {

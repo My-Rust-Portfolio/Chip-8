@@ -139,6 +139,22 @@ impl Cpu {
         self.registers[x] <<= 1;
         self.registers[0xF] = dropped_bit;
     }
+
+    pub fn set_register_x_to_delay_timer(&mut self, x: usize) {
+        self.set_register_x_to_nn(x, self.delay_timer);
+    }
+
+    pub fn set_delay_timer_to_register_x(&mut self, x: usize) {
+        self.delay_timer = self.registers[x];
+    }
+
+    pub fn set_sound_timer_to_register_x(&mut self, x: usize) {
+        self.sound_timer = self.registers[x];
+    }
+
+    pub fn add_register_x_to_index_register(&mut self, x: usize) {
+        self.set_index_register(self.registers[x] as u16 + self.index_register);
+    }
 }
 
 // ============ private helpers ============

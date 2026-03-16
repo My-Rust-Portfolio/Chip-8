@@ -15,7 +15,7 @@ impl Display {
     }
 
     pub fn clear(&mut self) {
-        self.display = [false; DISPLAY_SIZE];
+        self.display.fill(false);
     }
 
     pub fn get_pixel(&self, index: usize) -> bool {

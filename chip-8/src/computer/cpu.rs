@@ -1,3 +1,4 @@
+use eframe::egui;
 use rand::RngExt;
 
 // First 512bytes (0x200) are for system, hence CHIP-8 games always start from 0x200 address
@@ -186,6 +187,62 @@ impl Cpu {
         if self.sound_timer > 0 {
             self.sound_timer -= 1;
         }
+    }
+
+    pub fn draw_ui(&self, ui: &mut egui::Ui) {
+        ui.heading("CPU State");
+        ui.separator();
+
+        ui.label("Registers:");
+        egui::Grid::new("registers_grid")
+            .num_columns(2)
+            .striped(true)
+            .show(ui, |ui| {
+                for (i, val) in self.registers.iter().enumerate() {
+                    ui.label(format!("V{:X}", i));
+                    ui.label(format!("0x{:02X} ({})", val, val));
+                    ui.end_row();
+                }
+            });
+
+        ui.separator();
+
+        egui::Grid::new("special_regs")
+            .num_columns(2)
+            .show(ui, |ui| {
+                ui.label("PC:");
+                ui.label(format!("0x{:04X}", self.program_counter));
+                ui.end_row();
+                ui.label("I:");
+                ui.label(format!("0x{:04X}", self.index_register));
+                ui.end_row();
+                ui.label("Delay Timer:");
+                ui.label(self.delay_timer.to_string());
+                ui.end_row();
+                ui.label("Sound Timer:");
+                ui.label(self.sound_timer.to_string());
+                ui.end_row();
+            });
+
+        ui.separator();
+
+        ui.label("Stack:");
+        egui::ScrollArea::vertical()
+            .id_salt("cpu_stack_scroll")
+            .max_height(100.0)
+            .show(ui, |ui| {
+                for (i, val) in self.stack.iter().enumerate() {
+                    // Highlight the current stack pointer
+                    if i as u8 == self.stack_p {
+                        ui.label(
+                            egui::RichText::new(format!("> [{}] 0x{:04X}", i, val))
+                                .color(egui::Color32::YELLOW),
+                        );
+                    } else {
+                        ui.label(format!("  [{}] 0x{:04X}", i, val));
+                    }
+                }
+            });
     }
 }
 

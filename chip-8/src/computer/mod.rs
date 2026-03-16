@@ -4,6 +4,7 @@ mod keyboard;
 mod ram;
 use cpu::{CHIP8_ROM_START, Cpu, SkipCondition};
 use display::Display;
+use eframe::egui;
 use keyboard::Keyboard;
 use ram::{CHIP8_RAM_FONTDATA_START, Ram};
 use std::fs;
@@ -296,6 +297,12 @@ impl Chip8 {
 
     pub fn is_pixel_set(&self, index: usize) -> bool {
         self.display.get_pixel(index)
+    }
+
+    pub fn draw_debug_ui(&self, ui: &mut egui::Ui) {
+        self.cpu.draw_ui(ui);
+        ui.add_space(10.0);
+        self.ram.draw_ui(ui, self.cpu.get_program_counter());
     }
 }
 

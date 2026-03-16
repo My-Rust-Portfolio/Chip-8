@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 fn main() -> eframe::Result<()> {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_inner_size([800.0, 800.0])
+            .with_inner_size([1000.0, 1000.0])
             .with_resizable(false),
         ..Default::default()
     };
@@ -100,7 +100,7 @@ impl eframe::App for EmulatorApp {
         });
 
         // game speed
-        for _ in 0..1 {
+        for _ in 0..6 {
             self.chip8.tick();
         }
 
@@ -113,6 +113,13 @@ impl eframe::App for EmulatorApp {
             // reset the clock for the next timer tick
             self.last_timer_tick = Instant::now();
         }
+
+        egui::SidePanel::right("debug_panel")
+            .resizable(true)
+            .min_width(200.0)
+            .show(ctx, |ui| {
+                self.chip8.draw_debug_ui(ui);
+            });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Chip-8 Emulator");

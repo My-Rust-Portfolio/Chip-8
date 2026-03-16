@@ -1,3 +1,5 @@
+use eframe::egui;
+
 // Font data starts at byte 80 (0x50)
 pub const CHIP8_RAM_FONTDATA_START: usize = 0x50;
 
@@ -52,6 +54,60 @@ impl Ram {
 
     pub fn read_slice(&self, start_address: u16, length: usize) -> &[u8] {
         &self.memory[start_address as usize..length]
+    }
+
+    pub fn draw_ui(&self, ui: &mut egui::Ui, current_program_counter: u16) {
+        ui.heading("RAM");
+        ui.separator();
+
+        const TOTAL_ROWS: usize = 4096 / 8;
+
+        // 2. Calculate the exact height of one row of text so egui knows how big the scrollbar should be
+        let text_height = ui.text_style_height(&egui::TextStyle::Monospace);
+        let row_height = text_height + ui.spacing().item_spacing.y;
+
+        egui::ScrollArea::vertical()
+            .id_salt("ram_scroll")
+            .max_height(300.0)
+            .auto_shrink([false; 2])
+            // only iterate over the visible rows
+            .show_rows(ui, row_height, TOTAL_ROWS, |ui, row_range| {
+                for row_index in row_range {
+                    let base_address = row_index * 8;
+                    let chunk = &self.memory[base_address..(base_address + 8)];
+
+                    ui.horizontal(|ui| {
+                        // address on the left
+                        ui.label(
+                            egui::RichText::new(format!("0x{:04X}:", base_address))
+                                .family(egui::FontFamily::Monospace)
+                                .color(egui::Color32::DARK_GRAY),
+                        );
+
+                        // 8 bytes on the right
+                        for (byte_index, byte) in chunk.iter().enumerate() {
+                            let absolute_address = (base_address + byte_index) as u16;
+
+                            let is_pc = absolute_address == current_program_counter
+                                || absolute_address == current_program_counter + 1;
+
+                            let text = egui::RichText::new(format!("{:02X}", byte))
+                                .family(egui::FontFamily::Monospace);
+
+                            if is_pc {
+                                ui.label(
+                                    text.color(egui::Color32::BLACK)
+                                        .background_color(egui::Color32::YELLOW),
+                                );
+                            } else if *byte == 0 {
+                                ui.label(text.color(egui::Color32::DARK_GRAY));
+                            } else {
+                                ui.label(text);
+                            }
+                        }
+                    });
+                }
+            });
     }
 }
 
